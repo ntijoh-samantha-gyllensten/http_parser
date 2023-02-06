@@ -1,0 +1,7 @@
+source 'https://rubygems.org'
+
+gem 'minitest'
+gem 'mime-types'
+gem 'byebug'
+
+# bundle install
