@@ -1,5 +1,4 @@
 require 'socket'
-# require 'mime/types'
 require_relative "request_handler"
 require_relative "http_response"
 require_relative "content_length"
@@ -14,32 +13,30 @@ class HTTPServer
 
     def resource_check(request)
 
-        p request["resource"]
         if request["resource"] != "/favicon.ico"
+            # checks content type using the class ContentType in content_type 
             type = ContentType.new(request["resource"])
             type = type.content_type
-            p type
+            # takes the latter part of the MIME type to identify what output is appropriate
             type = type.split("/")
             type = type[1]
-            p type
 
             if type != "*"
                 full_resource = "#{type}" + request["resource"]
             else
-                p "HWEW"
-                p request["resource"]
                 full_resource = "." + request["resource"]
             end
-            p full_resource
 
+            # length was affecting css and image file reads, temporarily disabled
             # length = ContentLength.new(full_resource)
             # length = length.length
             length = 0
 
+            # Reassigns the variable type as the full MIME type
             type = ContentType.new(full_resource)
             type = type.content_type
-            p type
 
+            # Uses the httpresponse class to construct the response
             HTTPResponse.new(full_resource, length, type)
         end
     end
@@ -60,8 +57,10 @@ class HTTPServer
 
             #Er HTTP-PARSER tar emot "data"
             request = @handler.parse_request(data)
+            # runs the resourse check for resource, type and length
             run = resource_check(request)
 
+            # checks that the resource being requested is not favicon, as the feature is not supported yet
             if request["resource"] != "/favicon.ico"
                 session.print run.print_response
             end
@@ -70,8 +69,3 @@ class HTTPServer
         end
     end
 end
-
-
-# class ContentType
-
-# end

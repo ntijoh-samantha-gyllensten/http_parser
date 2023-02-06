@@ -1,49 +1,34 @@
-# require 'byebug'
-require 'socket'
-
+#assigns response output
 class HTTPResponse
 
     def initialize(resource, length, type)
-        @status = 0
         @length = length
         @resource = resource
         @type = type
-        # p "Length:"
-        # p @length
-        # p "RESOURCE"
-        # p @resource
-        # byebug
-        # p "#{File.read(@resource)}"
+
+        # assigns status (possibly move to seperate method?)
         if File.exist?("#{@resource}")
-            # if resource =~ /.html/
             @status = 200
-            # end
         else
             @status = 404
-            resource = "./http_parser/html/404.html"
+            resource = "./http_parser/html/404.html" #sets resource as error page
         end
     end
 
     def print_response
 
-        # fileread = File.read(@resource)
-
-        # if request["resource"] != "/favicon.ico"
-        #     session.print("HTTP/1.1 #{@status}\r\n")
-        #     session.print("Content-Type: #{@type}\r\n")
-        #     session.print("Content-Length: #{@length}\r\n")
-        #     session.print("\r\n")
-        #     session.print("#{fileread}")
-        # end
         output = ""
-        output += "HTTP/1.1 #{@status}\r\n"
-        output += "Content-type: #{@type}\r\n"
-        # output += "Content-length: #{@length}\r\n"
+        output += "HTTP/1.1 #{@status}\r\n" #outputs status
+        output += "Content-type: #{@type}\r\n" #outputs content type
+        # output += "Content-length: #{@length}\r\n" #temporarily disabled as it was clashing with img and css
         output +=  "\r\n"
+
+        # checks if the file type is image or other to use approriate file read
         if @type == "image/*"
             output += File.binread(@resource)
         else
             output += File.read(@resource)
         end
+
     end
 end

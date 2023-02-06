@@ -1,11 +1,12 @@
+# Checks a file's content type
 class ContentType
 
     def initialize(resource)
         @resource = resource
-        p @resource
         @content_type = ""
     end
 
+    # method that assigns the content type (MIME) based on the file type
     def content_type
         if /.html/ =~ "#{@resource}" || /.htm/ =~ "#{@resource}"
             @content_type += "text/html"

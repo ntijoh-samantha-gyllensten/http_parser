@@ -1,3 +1,4 @@
+# checks file content's length
 class ContentLength
 
     def initialize(resource)
