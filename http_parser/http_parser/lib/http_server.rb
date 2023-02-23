@@ -1,14 +1,17 @@
 require 'socket'
 require_relative "request_handler"
 require_relative "http_response"
-require_relative "content_length"
 require_relative "content_type"
+
+p "this code runs"
 
 class HTTPServer
 
     def initialize(port)
         @port = port
         @handler = RequestHandler.new
+
+        p "INIT"
     end
 
     def resource_check(request)
@@ -18,8 +21,13 @@ class HTTPServer
             type = ContentType.new(request["resource"])
             type = type.content_type
             # takes the latter part of the MIME type to identify what output is appropriate
-            type = type.split("/")
-            type = type[1]
+            # this currently breaks if the file doesnt exists, needs fixing
+            if type != nil
+                type = type.split("/")
+                type = type[1]
+            else
+                type = ""
+            end
 
             if type != "*"
                 full_resource = "#{type}" + request["resource"]
@@ -27,17 +35,12 @@ class HTTPServer
                 full_resource = "." + request["resource"]
             end
 
-            # length was affecting css and image file reads, temporarily disabled
-            # length = ContentLength.new(full_resource)
-            # length = length.length
-            length = 0
-
-            # Reassigns the variable type as the full MIME type
-            type = ContentType.new(full_resource)
-            type = type.content_type
+            # Assigns the variable mine_type as the full MIME type
+            mine_type = ContentType.new(full_resource)
+            mime_type = mine_type.content_type
 
             # Uses the httpresponse class to construct the response
-            HTTPResponse.new(full_resource, length, type)
+            HTTPResponse.new(full_resource, mime_type)
         end
     end
 
@@ -58,14 +61,18 @@ class HTTPServer
             #Er HTTP-PARSER tar emot "data"
             request = @handler.parse_request(data)
             # runs the resourse check for resource, type and length
-            run = resource_check(request)
+            http_response = resource_check(request)
 
             # checks that the resource being requested is not favicon, as the feature is not supported yet
             if request["resource"] != "/favicon.ico"
-                session.print run.print_response
+                # prints http_response
+                session.print http_response.print_response
             end
 
             session.close
         end
     end
 end
+
+server = HTTPServer.new(4567)
+server.start
