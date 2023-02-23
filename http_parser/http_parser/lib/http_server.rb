@@ -10,8 +10,6 @@ class HTTPServer
     def initialize(port)
         @port = port
         @handler = RequestHandler.new
-
-        p "INIT"
     end
 
     def resource_check(request)

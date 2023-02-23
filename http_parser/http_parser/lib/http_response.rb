@@ -6,8 +6,6 @@ class HTTPResponse
         @type = type
 
         # assigns status (possibly move to seperate method?)
-        p "file existance"
-        p File.exist?("#{@resource}")
         if File.exist?("#{@resource}")
             @status = 200
         else
