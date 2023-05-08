@@ -10,39 +10,37 @@ class HTTPResponse
     end
 
     def self.resource_check(request)
+
+        mime_type = ContentType.new(request["resource"])
+        mime_type = mime_type.full_type
+
+        if mime_type.to_s.match(/html/)
+            resource = "public/html" + request["resource"]
+        else
+            resource = "public" + request["resource"]
+        end
         
-        # if request["resource"] != "/favicon.ico"
-            # checks content type using the class ContentType in content_type 
-            mime_type = ContentType.new(request["resource"])
-            mime_type_second = mime_type.second_type
-            # mime_type_full = mime_type.full_type
-    
-            if "*" == "#{mime_type_second}"
-                resource = "../public/" + request["resource"]
-            else
-                resource = "../public/#{mime_type_second}" + request["resource"]
-            end
-            
-             # assigns status (possibly move to seperate method?)
-            if File.exist?("#{resource}") && File.directory?("#{resource}") != true
-                status = 200
-            else
-                status = 404
-                resource = "../public/html/404.html" #sets resource as error page
-            end
+        # assigns status
+        if File.exist?("#{resource}") && File.directory?("#{resource}") != true
+            status = 200
+        else
+            status = 404
+            #sets resource as error page
+            resource = "public/html/404.html" 
+        end
 
-            # checks if the file type is image or other to use approriate file read
-            if /text/ =~ "#{mime_type}"
-                content = File.read(resource)
-            else
-                content = File.binread(resource)
-            end
-            length = content.length
+        # checks if the file type is image or other to use approriate file read
+        # Does not show error message if the error is the image, which is good as you still want to display the page, but with the alternative text instead
+        if /text/ =~ mime_type.to_s
+            content = File.read(resource)
+        else
+            content = File.binread(resource)
+        end
 
-            return new(status, content, length)
-            # Uses the httpresponse class to construct the response
-            
-        # end
+        length = content.length
+
+        return new(status, content, length)
+        # Uses the httpresponse class to construct the response
     end
 
     def from_dynamic_route(content)
@@ -59,7 +57,7 @@ class HTTPResponse
         output = ""
         output += "HTTP/1.1 #{@status}\r\n" #outputs status
         output += "Content-type: #{@mime_type}\r\n" #outputs content type
-        output += "Content-length: #{@length}\r\n" #temporarily disabled as it was clashing with img and css
+        output += "Content-length: #{@length}\r\n" 
         output +=  "\r\n"
         output += @content
 

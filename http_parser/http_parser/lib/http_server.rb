@@ -5,9 +5,13 @@ require_relative "content_type"
 
 class HTTPServer
 
+    attr_reader :router
+    
+
     def initialize(port)
         @port = port
         @handler = RequestHandler.new
+        @router = Router.new
     end
 
     
@@ -15,15 +19,6 @@ class HTTPServer
         server = TCPServer.new(@port)
         puts "Listening on #{@port}"
 
-        @router = Router.new
-
-        @router.add_route(:get, '/hello') do
-            "<h1>Hello!</h1>"
-        end
-
-        @router.add_route(:get, '/hello/:name/:mood/:hay') do |name, mood, hay|
-            "<h1>Hello, #{name}! How are you? I'm #{mood}, thanks for asking. #{hay} </h1>"
-        end
 
         while session = server.accept
             data = ""

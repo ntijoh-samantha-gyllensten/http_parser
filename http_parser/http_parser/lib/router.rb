@@ -25,7 +25,6 @@ class Router
     def match_route(input_route)
 
         route = @routes.find do |route| 
-            p "-" * 40
 
             if route[:route].match(/:/)
                 route_exp = route[:route].gsub(/\/:\w+/, '\/\w+')
@@ -40,10 +39,10 @@ class Router
         end
 
         if route != nil
+            
             params = params(input_route)
-
-            p route[:code].call(params)
             return route[:code].call(params)
+
         else
             return nil
         end
