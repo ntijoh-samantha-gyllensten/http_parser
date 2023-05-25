@@ -4,4 +4,5 @@ gem 'minitest'
 gem 'mime-types'
 gem 'byebug'
 
-# bundle install
+source "https://rubygems.org"
+gem 'yard'
